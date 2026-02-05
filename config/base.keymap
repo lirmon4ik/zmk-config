@@ -1,42 +1,19 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/mouse.h>
 
-#define ENG 0   // English - Colemak-DH
-#define EPP 1   // Antecedent Morph Cpp overlay
-#define X64 2   // Antecedent Morph x64 overlay
-#define GMK 3   // Antecedent Morph GNU Make overlay
-#define ENN 4   // English navigation
-#define NUE 5   // English numerics
-#define SYE 6   // English symbols (shifted numerics)
-#define RUS 7   // Russian - Diktor
-#define RUN 8   // Russian navigation
-#define NUR 9   // Russian numerics
-#define SYR 10  // Russian symbols (shifted numerics)
-#define FUN 11  // Function keys
-#define FN2 12  // Extended Function keys
-#define MED 13  // Media controls
-#define MOS 14  // Mouse
-#define FMO 15  // Fast Mouse overlay
-#define SMO 16  // Slow Mouse overlay
-#define BTN 17  // Buttons for external pointing device
-#define BTO 18  // BT and outputs
-#define CTX 19  // Context
-#define DGR 20  // Dangerous behaviors
+#define DEF 0    // Default layer
+#define LWR 1    // Lower layer
+#define MOS 2    // Mouse layer  
+#define ADJ 3    // Adjust layer
+#define FMO 4    // Fast Mouse overlay
+#define SMO 5    // Slow Mouse overlay
+#define NUM 6    // Numbers layer
 
-// Global U_ser settings
-#define U_TO_RUS_SCUT LC(LS(N2))
-#define U_TO_ENG_SCUT LC(LS(N1))
-
-#define U_TAPPING_TERM 300
-#define U_QUICK_TAP 0
+#define U_TAPPING_TERM 200
+#define U_QUICK_TAP 200
 #define U_STREAK_DECAY 150
-#define U_COMBO_TIMEOUT 75
-#define U_COMBO_STREAK_DECAY 300
-#define U_ANTMORPH_DELAY 10000
-#define U_ANTMORPH_MACRO_TAP 3
-#define U_ANTMORPH_MACRO_WAIT 10
 
 #define LEFT_HAND_KEYS   \
      0  1  2  3  4  5    \
@@ -49,604 +26,145 @@
                          30 31 32 33 34 35
 
 #define LEFT_THUMB_KEYS  \
-             36 37 38 
+             36 37 38
 
 #define RIGHT_THUMB_KEYS \
                          39 40 41
-                     
-#include "mouse.dtsi"
-#include "antecedent_morph_cpp.dtsi"
-#include "antecedent_morph_x64.dtsi"
-#include "antecedent_morph_gmk.dtsi"
-#include "antecedent_morph_english.dtsi"
-#include "diktor.dtsi"
 
-&lt { 
+&lt {
     flavor = "balanced";
     tapping-term-ms = <U_TAPPING_TERM>;
-    quick-tap-ms = <U_QUICK_TAP>; 
-};
-&mt { 
-    flavor = "balanced";
-    tapping-term-ms = <U_TAPPING_TERM>;
-    quick-tap-ms = <U_QUICK_TAP>; 
+    quick-tap-ms = <U_QUICK_TAP>;
 };
 
-&caps_word {
-    continue-list = <UNDERSCORE RS(MINUS) BACKSPACE DELETE>;
+&mt {
+    flavor = "balanced";
+    tapping-term-ms = <U_TAPPING_TERM>;
+    quick-tap-ms = <U_QUICK_TAP>;
 };
 
 / {
-        conditional_layers {
-            compatible = "zmk,conditional-layers";
-            
-            danger_layer1 {
-                if-layers = <MED MOS>;
-                then-layer = <DGR>;
-            };
-            danger_layer2 {
-                if-layers = <SYE FUN>;
-                then-layer = <DGR>;
-            };
-            danger_layer3 {
-                if-layers = <SYR FUN>;
-                then-layer = <DGR>;
-            };
-            
-            bt_layer1 {
-                if-layers = <SYE NUE>;
-                then-layer = <BTO>;
-            };
-            bt_layer2 {
-                if-layers = <SYR NUR>;
-                then-layer = <BTO>;
-            };
-            
-            ctx_layer {
-                if-layers = <ENN MOS>;
-                then-layer = <CTX>;
-            };
-        };
-        
-        behaviors {
-            tog_on: toggle_layer_on {
-                compatible = "zmk,behavior-toggle-layer";
-                #binding-cells = <1>;
-                display-name = "Toggle Layer On";
-                toggle-mode = "on";
-            };
-            tog_off: toggle_layer_off {
-                compatible = "zmk,behavior-toggle-layer";
-                #binding-cells = <1>;
-                display-name = "Toggle Layer Off";
-                toggle-mode = "off";
-            };
-            // Global
-            lsht: left_shift_tap {
-                compatible = "zmk,behavior-hold-tap";
-                flavor = "balanced";
-                hold-trigger-key-positions = <RIGHT_HAND_KEYS RIGHT_THUMB_KEYS>;
-                hold-trigger-on-release; // for combining HRMs
-                tapping-term-ms = <U_TAPPING_TERM>;
-                quick-tap-ms = <U_QUICK_TAP>;
-                #binding-cells = <2>;
-                bindings = <&kp>, <&kp>;
-            };
-            lmt: left_mod_tap {
-                compatible = "zmk,behavior-hold-tap";
-                flavor = "balanced";
-                hold-trigger-key-positions = <RIGHT_HAND_KEYS RIGHT_THUMB_KEYS>;
-                hold-trigger-on-release; // for combining HRMs
-                tapping-term-ms = <U_TAPPING_TERM>;
-                quick-tap-ms = <U_QUICK_TAP>;
-                require-prior-idle-ms = <U_STREAK_DECAY>;
-                #binding-cells = <2>;
-                bindings = <&kp>, <&kp>;
-            };
-            rsht: right_shift_tap {
-                compatible = "zmk,behavior-hold-tap";
-                flavor = "balanced";
-                hold-trigger-key-positions = <LEFT_HAND_KEYS LEFT_THUMB_KEYS>;
-                hold-trigger-on-release; // for combining HRMs
-                tapping-term-ms = <U_TAPPING_TERM>;
-                quick-tap-ms = <U_QUICK_TAP>;
-                #binding-cells = <2>;
-                bindings = <&kp>, <&kp>;
-            };
-            rmt: right_mod_tap {
-                compatible = "zmk,behavior-hold-tap";
-                flavor = "balanced";
-                hold-trigger-key-positions = <LEFT_HAND_KEYS LEFT_THUMB_KEYS>;
-                hold-trigger-on-release; // for combining HRMs
-                tapping-term-ms = <U_TAPPING_TERM>;
-                quick-tap-ms = <U_QUICK_TAP>;
-                require-prior-idle-ms = <U_STREAK_DECAY>;
-                #binding-cells = <2>;
-                bindings = <&kp>, <&kp>;
-            };
-            mlt: mouse_layer_tap {
-                compatible = "zmk,behavior-hold-tap";
-                flavor = "hold-preferred";
-                tapping-term-ms = <U_TAPPING_TERM>;
-                quick-tap-ms = <U_QUICK_TAP>;
-                #binding-cells = <2>;
-                bindings = <&mo>, <&kp>;
-            };
-            
-            // English layer
-            collp: colemak_lpar {
-                compatible = "zmk,behavior-mod-morph";
-                label = "COLEMAK_LEFT_PARENTHESIS";
-                #binding-cells = <0>;
-                bindings = <&kp LPAR>, <&kp SEMI>;
-                mods = <(MOD_RSFT)>;
-            };
-            colrp: colemak_rpar {
-                compatible = "zmk,behavior-mod-morph";
-                label = "COLEMAK_RIGHT_PARENTHESIS";
-                #binding-cells = <0>;
-                bindings = <&kp RPAR>, <&kp COLON>;
-                mods = <(MOD_LSFT)>;
-            };
-            
-            // English Number layer
-            numabr: numeric_angle_brackets {
-                compatible = "zmk,behavior-mod-morph";
-                label = "NUMERIC_ANGLE_BRACKETS";
-                #binding-cells = <0>;
-                bindings = <&kp LESS_THAN>, <&kp GREATER_THAN>;
-                mods = <(MOD_RSFT)>;
-            };
-            num7: numeric_7 {
-                compatible = "zmk,behavior-mod-morph";
-                label = "NUMERIC_7";
-                #binding-cells = <0>;
-                bindings = <&kp N7>, <&kp LPAR>;
-                mods = <(MOD_RSFT)>;
-            };
-            num9: numeric_9 {
-                compatible = "zmk,behavior-mod-morph";
-                label = "NUMERIC_9";
-                #binding-cells = <0>;
-                bindings = <&kp N9>, <&kp RPAR>;
-                mods = <(MOD_RSFT)>;
-            };
-            //  ./,
-            numdorc: numeric_dot_or_comma {
-                compatible = "zmk,behavior-mod-morph";
-                label = "NUMERIC_DOT_OR_COMMA";
-                #binding-cells = <0>;
-                bindings = <&kp DOT>, <&kp COMMA>;
-                mods = <(MOD_RSFT)>;
-            };
-            num0: numeric_0 {
-                compatible = "zmk,behavior-mod-morph";
-                label = "NUMERIC_0";
-                #binding-cells = <0>;
-                bindings = <&kp N0>, <&kp AMPERSAND>;
-                mods = <(MOD_RSFT)>;
-            };
+    behaviors {
+        lsht: left_shift_tap {
+            compatible = "zmk,behavior-hold-tap";
+            flavor = "balanced";
+            hold-trigger-key-positions = <RIGHT_HAND_KEYS RIGHT_THUMB_KEYS>;
+            hold-trigger-on-release;
+            tapping-term-ms = <U_TAPPING_TERM>;
+            quick-tap-ms = <U_QUICK_TAP>;
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
         };
 
-        macros {
-            ZMK_MACRO(to_russian,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&kp U_TO_RUS_SCUT>, <&tog_on RUS>;
-            )
-            ZMK_MACRO(to_english,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&kp U_TO_ENG_SCUT>, <&tog_off RUS>;
-            )
-            engkp: english_kp {
-                compatible = "zmk,behavior-macro-one-param";
-                wait-ms = <20>;
-                tap-ms = <20>;
-                #binding-cells = <1>;
-                bindings 
-                    = <&kp U_TO_ENG_SCUT>
-                    , <&macro_param_1to1>
-                    , <&kp MACRO_PLACEHOLDER>
-                    , <&kp U_TO_RUS_SCUT>
-                    ;
-                
-            };
-            btsel: bt_select {
-                compatible = "zmk,behavior-macro-one-param";
-                #binding-cells = <1>;
-                bindings 
-                    = <&out OUT_BLE>
-                    , <&macro_param_1to2>
-                    , <&bt BT_SEL MACRO_PLACEHOLDER>
-                    ;
-            };
-            ZMK_MACRO(off_amall,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&tog_off EPP>, <&tog_off X64>, <&tog_off GMK>;
-            )
-            ZMK_MACRO(to_amcpp,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&off_amall>, <&tog_on EPP>;
-            )
-            ZMK_MACRO(to_amx64,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&off_amall>, <&tog_on X64>;
-            )
-            ZMK_MACRO(to_amgmk,
-                wait-ms = <20>;
-                tap-ms = <20>;
-                bindings = <&off_amall>, <&tog_on GMK>;
-            )
-        };
-        
-        combos {
-            compatible = "zmk,combos";
-            combo_force_rus {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <36 41>;
-                layers = <RUS>;
-                bindings = <&kp U_TO_RUS_SCUT>;
-                require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
-            combo_force_eng {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <36 41>;
-                layers = <ENG EPP X64 GMK>;
-                bindings = <&kp U_TO_ENG_SCUT>;
-                require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
-            combo_switch_to_rus {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <0 11>;
-                layers = <ENG EPP X64 GMK>;
-                bindings = <&to_russian>;
-                //require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
-            combo_switch_to_eng {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <0 11>;
-                layers = <RUS>;
-                bindings = <&to_english>;
-                //require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
-            combo_key_capslock {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <24 35>;
-                layers = <ENG EPP X64 GMK RUS>;
-                bindings = <&kp CAPSLOCK>;
-                //require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
-            combo_caps_word {
-                timeout-ms = <U_COMBO_TIMEOUT>;
-                key-positions = <12 23>;
-                layers = <ENG EPP X64 GMK>;
-                bindings = <&caps_word>;
-                //require-prior-idle-ms = <U_COMBO_STREAK_DECAY>;
-            };
+        lmt: left_mod_tap {
+            compatible = "zmk,behavior-hold-tap";
+            flavor = "balanced";
+            hold-trigger-key-positions = <RIGHT_HAND_KEYS RIGHT_THUMB_KEYS>;
+            hold-trigger-on-release;
+            tapping-term-ms = <U_TAPPING_TERM>;
+            quick-tap-ms = <U_QUICK_TAP>;
+            require-prior-idle-ms = <U_STREAK_DECAY>;
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
         };
 
-        keymap {
-                compatible = "zmk,keymap";
-
-                english_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   Q   |   W   |   F   |   P   |   B   |     |   J   |   L   |   U   |   Y   |   "   |  AMNE |
-// | AMW   |   A   |   R   |   S   |   T   |   G   |     |   M   |   N   |   E   |   I   |   O   |   AME |
-// | AMSW  |   Z   |   X   |   C   |   D   |   V   |     |   K   |   H   |   ,   |   .   |   /   |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  DEL  |  BKSP |  RET  |     |  TAB  | SPACE |  ESC  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amennwm  &kp Q         &kp W         &kp F         &kp P             &kp B         &kp J         &kp L            &kp U         &kp Y        &kp SQT       &amennem       
-          &amenwm   &lmt LGUI A   &lmt LALT R   &lsht LSHFT S &lmt LCTRL T      &kp G         &kp M         &rmt RCTRL N     &rsht RSHFT E &rmt RALT I  &rmt RGUI O   &amenem
-          &amenswm  &kp Z         &kp X         &kp C         &kp D             &kp V         &kp K         &kp H            &kp COMMA     &kp DOT      &kp FSLH      &amensem
-                                            &lt MED DEL   &lt ENN BSPC   &mlt MOS RET   &lt SYE TAB   &lt NUE SPACE  &lt FUN ESC
-                        >;
-                };
-                am_cpp_overlay {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   Q   |   W   |   F   |   P   |   B   |     |   J   |   L   |   U   |   Y   |   "   |  AMNE |
-// | AMW   |   A   |   R   |   S   |   T   |   G   |     |   M   |   N   |   E   |   I   |   O   |   AME |
-// | AMSW  |   Z   |   X   |   C   |   D   |   V   |     |   K   |   H   |   ,   |   .   |   /   |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  DEL  |  BKSP |  RET  |     |  TAB  | SPACE |  ESC  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amcppnwm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amcppnem       
-          &amcppwm  &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amcppem
-          &amcppswm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amcppsem
-                                            &trans      &trans     &trans    &trans    &trans     &trans
-                        >;
-                };
-                am_x64_overlay {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   Q   |   W   |   F   |   P   |   B   |     |   J   |   L   |   U   |   Y   |   "   |  AMNE |
-// | AMW   |   A   |   R   |   S   |   T   |   G   |     |   M   |   N   |   E   |   I   |   O   |   AME |
-// | AMSW  |   Z   |   X   |   C   |   D   |   V   |     |   K   |   H   |   ,   |   .   |   /   |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  DEL  |  BKSP |  RET  |     |  TAB  | SPACE |  ESC  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amx64nwm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amx64nem       
-          &amx64wm  &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amx64em
-          &amx64swm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amx64sem
-                                            &trans      &trans     &trans    &trans    &trans     &trans
-                        >;
-                };
-                am_gmk_overlay {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   Q   |   W   |   F   |   P   |   B   |     |   J   |   L   |   U   |   Y   |   "   |  AMNE |
-// | AMW   |   A   |   R   |   S   |   T   |   G   |     |   M   |   N   |   E   |   I   |   O   |   AME |
-// | AMSW  |   Z   |   X   |   C   |   D   |   V   |     |   K   |   H   |   ,   |   .   |   /   |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  DEL  |  BKSP |  RET  |     |  TAB  | SPACE |  ESC  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amgmknwm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amgmknem       
-          &amgmkwm  &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amgmkem
-          &amgmkswm &trans        &trans        &trans        &trans            &trans         &trans        &trans           &trans        &trans       &trans        &amgmksem
-                                            &trans      &trans     &trans    &trans    &trans     &trans
-                        >;
-                };
-                english_nav_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |  ESC  | CAPS  |  RUS  |       |       |     | PG_UP | HOME  |  UP   |  END  |  INS  |  AMNE |
-// |       |  LGUI | LALT  | LSHFT | LCTRL |  BTN  |     | PG_DN | LEFT  | DOWN  | RIGHT |  DEL  |   AME |
-// |       |       |       |       |       |       |     |       | CWORD | MENU  |       |       |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |  (0)  |       |     |  TAB  | SPACE |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &none     &kp ESC       &kp CAPS      &to_russian   &tog RUS          &none         &kp PG_UP     &kp HOME         &kp UP        &kp END      &kp INS       &amennavnem
-          &none     &kp LGUI      &kp LALT      &kp LSHFT     &kp LCTRL         &tog BTN      &kp PG_DN     &kp LEFT         &kp DOWN      &kp RIGHT    &kp DEL       &amennavem
-          &none     &none         &none         &none         &none             &none         &none         &caps_word       &kp K_CMENU   &none        &none         &amennavsem
-                                            &none     &trans          &trans         &kp TAB       &kp SPACE       &none
-                        >;
-                };
-                english_number_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   [   |  7/(  |   8   |  9/)  |   ]   |     |       |   ,   | SPACE |   .   |  ESC  |       |
-// | AMW   |   ;   |   4   |   5   |   6   |   =   |     |  BKSP | RCTRL | RSHFT |  RALT |  RGUI |       |
-// | AMSW  |   `   |   1   |   2   |   3   |   \   |     |       |       |       |       |   /   |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  ./,  |  0/&  |   -   |     |       |  (0)  |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amennumnwm  &kp LBKT      &num7         &kp N8        &num9             &kp RBKT      &none         &kp COMMA         &kp SPACE     &kp DOT    &kp ESC        &none           
-          &amennumwm   &kp SEMI      &kp N4        &kp N5        &kp N6            &kp EQUAL     &kp BSPC      &kp RCTRL         &kp RSHFT     &kp RALT   &kp RGUI       &none
-          &amennumswm  &kp GRAVE     &kp N1        &kp N2        &kp N3            &kp BSLH      &none         &none             &none         &none      &kp FSLH       &none
-                                            &numdorc  &num0           &kp MINUS    &trans        &trans         &none
-                        >;
-                };
-                english_symbol_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |   {   |   (   |   *   |   )   |   }   |     |       |       | SPACE |       |  ESC  |       |
-// | AMW   |   :   |   $   |   %   |   ^   |   +   |     |  BKSP | RCTRL | RSHFT |  RALT |  RGUI |       |
-// | AMSW  |   ~   |   !   |   @   |   #   |   |   |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |   ,   |   &   |   _   |     |  (0)  |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amensymnwm &kp LBRC      &kp LPAR      &kp ASTERISK  &kp RPAR          &kp RBRC      &none         &none             &kp SPACE     &none      &kp ESC        &none           
-          &amensymwm  &kp COLON     &kp DOLLAR    &kp PERCENT   &kp CARET         &kp PLUS      &kp BSPC      &kp RCTRL         &kp RSHFT     &kp RALT   &kp RGUI       &none
-          &amensymswm &kp TILDE     &kp EXCL      &kp AT_SIGN   &kp HASH          &kp PIPE      &none         &none             &none         &none      &none          &none
-                                            &kp COMMA  &kp AMPS     &kp UNDER    &trans        &trans          &trans
-                        >;
-                };
-                russian_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |   Ё   |   Ц   |  ь/ъ  |   Я   |  ,/?  |  ./!  |     |   З   |   В   |   К   |   Д   |   Ч   |   Ш   |
-// |  Ь/Ъ  |   У   |   И   |   Е   |   О   |   А   |     |   Л   |   Н   |   Т   |   С   |   Р   |   Й   |
-// |       |   Ф   |   Э   |   Х   |   Ы   |   Ю   |     |   Б   |   М   |   П   |   Г   |   Ж   |   Щ   |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  DEL  |  BKSP |  RET  |     |  TAB  | SPACE |  ESC  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &kp GRAVE &dikw         &dsoft        &dikz         &dcomma           &ddot         &dikp         &dikd            &dikr         &dikl        &kp X         &kp I       
-          &dbsoft   &mtde LGUI E  &mtdb LALT B  &mtdt LSHFT T &mtdj LCTRL J     &dikf         &dikk         &mtdy RCTRL Y    &mtdn RSHFT N &mtdc RALT C &mtdh RGUI H  &kp Q
-          &none     &dika         &dikapos      &diklbkt      &diks             &dikdot       &dikcomma     &dikv            &kp G         &kp U        &kp SEMI      &kp O
-                                            &lt MED DEL   &lt RUN BSPC   &mlt MOS RET   &lt SYR TAB   &lt NUR SPACE   &lt FUN ESC
-                        >;
-                };
-                russian_nav_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |  ESC  | CAPS  |  ENG  |       |       |     | PG_UP | HOME  |  UP   |  END  |  INS  |       |
-// |       |  LGUI | LALT  | LSHFT | LCTRL |  BTN  |     | PG_DN | LEFT  | DOWN  | RIGHT |  DEL  |       |
-// |       |       |       |       |       |       |     |       |       | MENU  |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |  (0)  |       |     |  TAB  | SPACE |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &none     &kp ESC       &kp CAPS      &to_english   &tog RUS          &none         &kp PG_UP     &kp HOME      &kp UP        &kp END      &kp INS       &none
-          &none     &kp LGUI      &kp LALT      &kp LSHFT     &kp LCTRL         &tog BTN      &kp PG_DN     &kp LEFT      &kp DOWN      &kp RIGHT    &kp DEL       &none
-          &none     &none         &none         &none         &none             &none         &none         &none         &kp K_CMENU   &none        &none         &none
-                                            &none     &none          &none         &kp TAB       &kp SPACE       &none
-                        >;
-                };
-                russian_number_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |  </>  |  [/{  |  7/(  |   8   |  9/)  |  ]/}  |     |       |   ,   | SPACE |   .   |  ESC  |       |
-// |  @/#  |  ;/:  |  4/$  |   5   |  6/^  |   =   |     |  BKSP | RCTRL | RSHFT |  RALT |  RGUI |       |
-// |       |  `/~  |  1/'  |   2   |   3   |   \   |     |       |       |       |       |   /   |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  ./,  |  0/&  |   -   |     |       |  (0)  |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &rnumabr  &rnumlbr      &rnum7        &kp N8        &rnum9            &rnumrbr      &none         &kp QMARK         &kp SPACE     &kp SLASH  &kp ESC        &none
-          &rnumat   &rnumscol     &rnum4        &kp N5        &rnum6            &kp EQUAL     &kp BSPC      &kp RCTRL         &kp RSHFT     &kp RALT   &kp RGUI       &none
-          &none     &rnumgrv      &rnum1        &kp N2        &kp N3            &kp BSLH      &none         &none             &none         &none      &kp PIPE       &none
-                                            &rnumdorc &rnum0          &kp MINUS    &trans        &trans          &none
-                        >;
-                };
-                russian_symbol_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |   >   |   {   |   (   |   *   |   )   |   }   |     |       |       | SPACE |       |  ESC  |       |
-// |   #   |   :   |   $   |   %   |   ^   |   +   |     |  BKSP | RCTRL | RSHFT |  RALT |  RGUI |       |
-// |       |   ~   |   '   |   "   |   №   |   /   |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |   ,   |   &   |   _   |     |  (0)  |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &engkp GT   &engkp LBRC  &kp LPAR      &kp STAR      &kp RPAR          &engkp RBRC   &none         &none             &kp SPACE     &none      &kp ESC        &none
-          &engkp HASH &kp CARET    &engkp DLLR   &kp PRCNT     &engkp CARET      &kp PLUS      &kp BSPC      &kp RCTRL         &kp RSHFT     &kp RALT   &kp RGUI       &none
-          &none       &engkp TILDE &engkp SQT    &kp AT_SIGN   &kp HASH          &kp PIPE      &none         &none             &none         &none      &none          &none
-                                            &kp QMARK  &engkp AMPS      &kp UNDER    &trans        &trans          &trans
-                        >;
-                };
-
-                function_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | AMNW  |  F12  |  F7   |  F8   |  F9   | PSCRN |     |       |       |  FN2  |       |  ESC  |       |
-// | AMW   |  F11  |  F4   |  F5   |  F6   | SLCK  |     |       | RCTRL | RSHFT |  RALT |  RGUI |       |
-// | AMSW  |  F10  |  F1   |  F2   |  F3   | PAUSE |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |  BKSP |  RET  |     |       |       |  (0)  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &amenfunnwm &kp F12       &kp F7        &kp F8        &kp F9            &kp PSCRN       &none       &none             &mo FN2       &none       &kp ESC        &none   
-          &amenfunwm  &kp F11       &kp F4        &kp F5        &kp F6            &kp SLCK        &none       &kp RCTRL         &kp RSHFT     &kp RALT    &kp RGUI       &none
-          &amenfunswm &kp F10       &kp F1        &kp F2        &kp F3            &kp PAUSE_BREAK &none       &none             &none         &none       &none          &none
-                                            &kp DEL      &kp BSPC      &kp RET      &trans        &none           &trans
-                        >;
-                };
-                function2_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |  F24  |  F17  |  F18  |  F19  |       |     |       |       |  (1)  |       |       |       |
-// |       |  F23  |  F14  |  F15  |  F16  |       |     |       |       |       |       |       |       |
-// |       |  F20  |  F21  |  F22  |  F13  |       |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |       |       |     |       |       |  (0)  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &trans    &kp F24       &kp F17       &kp F18       &kp F19           &trans          &trans      &trans            &trans        &trans       &trans        &trans   
-          &trans    &kp F23       &kp F14       &kp F15       &kp F16           &trans          &trans      &trans            &trans        &trans       &trans        &trans
-          &trans    &kp F20       &kp F21       &kp F22       &kp F13           &trans          &trans      &trans            &trans        &trans       &trans        &trans
-                                  &trans        &trans        &trans            &trans          &trans      &trans
-                        >;
-                };
-                media_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |       |       |       |       |       |     | STOP  |  P/P  | VOL+  |       |       |  AMNE |
-// |       |       |       | CMAKE |  CPP  |       |     |       |   <<  | VOL-  |  >>   | LOCK  |   AME |
-// |       |       |       |       |       |       |     |       |       | MUTE  |       |       |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  (0)  |       |       |     |       | KRPT  |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &none         &none         &none       &none     &none     &none     &kp C_STOP  &kp C_PP    &kp C_VOL_UP   &none       &none         &amenmednem
-          &none         &none         &none       &none     &tog EPP  &none     &none       &kp C_PREV  &kp C_VOL_DN   &kp C_NEXT  &kp C_AL_LOCK &amenmedem
-          &none         &none         &none       &none     &none     &none     &none       &none       &kp C_MUTE     &none       &none         &amenmedsem
-                                             &trans        &none         &trans         &trans      &key_repeat   &none
-                        >;
-                };
-                mouse_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | REDO1 |  ESC  |  CUT  | COPY  | PASTE | UNDO  |     | SC_UP | SC_LT | MV_UP | SC_RT |  ALL  |  AMNE |
-// | REDO2 |  LGUI |  LALT | LSHFT | LCTRL | FAST  |     | SC_DN | MV_LT | MV_DN | MV_RT |  DEL  |   AME |
-// |       |       |       |       |       | SLOW  |     |  BKSP | SPACE |  RET  |  MB4  |  MB5  |  AMSE |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |       |  (0)  |     |  RCLK |  LCLK |  MCLK |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &kp LC(Y)     &kp ESC        &kp LC(X)      &kp LC(C)      &kp LC(V)      &kp LC(Z)      &msc SCRL_UP     &msc SCRL_LEFT   &mmv MOVE_UP   &msc SCRL_RIGHT   &kp LC(A)      &amenmosnem
-          &kp LC(LS(Z)) &kp LGUI       &kp LALT       &kp LSHFT      &kp LCTRL      &mo FMO        &msc SCRL_DOWN   &mmv MOVE_LEFT   &mmv MOVE_DOWN &mmv MOVE_RIGHT   &kp DEL        &amenmosem
-          &none         &none          &none          &none          &none          &mo SMO        &kp BSPC         &kp SPACE        &kp RET        &mkp MB4          &mkp MB5       &amenmossem
-                                             &trans        &trans          &trans        &mkp RCLK      &mkp LCLK     &mkp MCLK
-                        >;
-                };
-                fast_mouse_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |       |       |       |       |       |     | SC_UP | SC_LT | MV_UP | SC_RT |       |       | x 2
-// |       |       |       |       |       |  (1)  |     | SC_DN | MV_LT | MV_DN | MV_RT |       |       | x 2
-// |       |       |       |       |       |       |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |       |  (0)  |     |       |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-                                             &trans         &trans          &trans         &trans      &trans       &trans
-                        >;
-                };
-                slow_mouse_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |       |       |       |       |       |     | SC_UP | SC_LT | MV_UP | SC_RT |       |       | x 1/2
-// |       |       |       |       |       |       |     | SC_DN | MV_LT | MV_DN | MV_RT |       |       | x 1/2
-// |       |       |       |       |       |  (1)  |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |       |  (0)  |     |       |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-          &trans        &trans         &trans         &trans         &trans         &trans         &trans       &trans      &trans      &trans      &trans         &trans
-                                             &trans         &trans          &trans         &trans      &trans       &trans
-                        >;
-                };
-                button_layer { // to work with an external pointing device
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | REDO1 |  ESC  |  CUT  | COPY  | PASTE | UNDO  |     |       |       |       |       |       |       |
-// | REDO2 |  LGUI |  LALT | LSHFT | LCTRL | UNTOG |     |       |       |       |       |       |       |
-// |       |       |       |       |  DEL  |  ALL  |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         | MCLK  | LCLK  | RCLK  |     |       |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &kp LC(Y)     &kp ESC       &kp LC(X)     &kp LC(C)     &kp LC(V)     &kp LC(Z)     &none           &none           &none          &none            &none         &none
-          &kp LC(LS(Z)) &kp LGUI      &kp LALT      &kp LSHFT     &kp LCTRL     &tog BTN      &none           &none           &none          &none            &none         &none
-          &none         &none         &none         &none         &kp DEL       &kp LC(A)     &none           &none           &none          &none            &none         &none
-                                                    &mkp MCLK     &mkp LCLK     &mkp RCLK     &none           &none           &none
-                        >;
-                };
-                bluetooth_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |       |       |  BLE  |  USB  |       |     |       |       |       |       |       |       |
-// |       |  BT0  |  BT1  |  BT2  |  BT3  |  BT4  |     |       |       |       |       |       |       |
-// |       |  DC0  |  DC1  |  DC2  |  DC3  |  DC4  |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |       |       |     |  (0)  |  (1)  |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &none         &none            &none          &out OUT_BLE   &out OUT_USB   &none          &none       &none       &none        &none       &none      &none
-          &none         &btsel 0         &btsel 1       &btsel 2       &btsel 3       &btsel 4       &none       &none       &none        &none       &none      &none
-          &none         &bt BT_DISC 0    &bt BT_DISC 1  &bt BT_DISC 2  &bt BT_DISC 3  &bt BT_DISC 4  &none       &none       &none        &none       &none      &none
-                                             &none        &none         &none         &trans      &trans   &none
-                        >;
-                };
-                context_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// |       |       |       |       |       |       |     |       |  X64  | GMAKE |       |       |       |
-// |       |       |       |       |       |       |     |  EN   |  CPP  | CMAKE |       |       |       |
-// |       |       |       |       |       |       |     |       |       |       |       |       |       |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |       |  (1)  |  (0)  |     |       |       |       |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &none         &none       &none      &none     &none       &none         &none        &to_amx64   &to_amgmk    &none       &none      &none
-          &none         &none       &none      &none     &none       &none         &off_amall   &to_amcpp   &none        &none       &none      &none
-          &none         &none       &none      &none     &none       &none         &none        &none       &none        &none       &none      &none
-                                               &none     &trans      &trans        &none        &none       &none
-                        >;
-                };
-                danger_layer {
-// ╭───────┬───────┬───────┬───────┬───────┬───────╮     ╭───────┬───────┬───────┬───────┬───────┬───────╮
-// | BOOTL | BTALL |       |       |       |       |     |       |       |       |       |       | BOOTL |
-// | BTCLR |       |       |       |       |       |     |       |       |       |       |       | S-OFF |
-// | RESET |       |       |       |       |       |     |       |       |       |       |       | RESET |
-// ╰───────┴───────┴───────┼───────┼───────┼───────┤     ├───────┼───────┼───────┼───────────────────────╯
-//                         |  (0)  |       |  (1)  |     |  (0)  |       |  (1)  |
-//                         ╰───────┴───────┴───────╯     ╰───────┴───────┴───────╯
-                        bindings = <
-          &bootloader   &bt BT_CLR_ALL &none         &none         &none         &none         &none           &none           &none          &none            &none         &bootloader
-          &bt BT_CLR    &none          &none         &none         &none         &none         &none           &none           &none          &none            &none         &soft_off
-          &sys_reset    &none          &none         &none         &none         &none         &none           &none           &none          &none            &none         &sys_reset
-                                                     &trans        &none         &trans        &trans          &none           &trans
-                        >;
-                };
+        rsht: right_shift_tap {
+            compatible = "zmk,behavior-hold-tap";
+            flavor = "balanced";
+            hold-trigger-key-positions = <LEFT_HAND_KEYS LEFT_THUMB_KEYS>;
+            hold-trigger-on-release;
+            tapping-term-ms = <U_TAPPING_TERM>;
+            quick-tap-ms = <U_QUICK_TAP>;
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
         };
+
+        rmt: right_mod_tap {
+            compatible = "zmk,behavior-hold-tap";
+            flavor = "balanced";
+            hold-trigger-key-positions = <LEFT_HAND_KEYS LEFT_THUMB_KEYS>;
+            hold-trigger-on-release;
+            tapping-term-ms = <U_TAPPING_TERM>;
+            quick-tap-ms = <U_QUICK_TAP>;
+            require-prior-idle-ms = <U_STREAK_DECAY>;
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+        };
+
+        mlt: mouse_layer_tap {
+            compatible = "zmk,behavior-hold-tap";
+            flavor = "hold-preferred";
+            tapping-term-ms = <U_TAPPING_TERM>;
+            quick-tap-ms = <U_QUICK_TAP>;
+            #binding-cells = <2>;
+            bindings = <&mo>, <&kp>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            bindings = <
+&kp ESC       &kp Q  &kp W            &kp E         &kp R               &kp T    &kp Y        &kp U                &kp I                 &kp O             &kp P     &kp LBKT
+&kp TAB       &kp A  &lmt LEFT_ALT S  &lmt LCTRL D  &lsht LEFT_SHIFT F  &mo NUM G  &mo NUM H      &rsht RIGHT_SHIFT J  &rmt RCTRL K          &rmt RIGHT_ALT L  &kp SEMI  &kp SQT
+&kp LEFT_WIN  &kp Z  &kp X            &kp C         &kp V               &kp B    &kp N        &kp M                &kp COMMA             &kp DOT           &kp FSLH  &mt LEFT_ALT GRAVE
+                                      &mo MOS       &kp SPACE           &mo LWR   &mo LWR ENTER  &kp BACKSPACE        &mo MOS LA(LEFT_SHIFT)
+            >;
+        };
+
+        lower_layer {
+            bindings = <
+&trans  &kp N1    &kp N2    &kp N3     &kp N4          &kp N5           &kp N6            &kp N7             &kp N8          &kp N9     &kp N0         &kp GRAVE
+&trans  &kp EXCL  &kp AT    &kp HASH   &kp DLLR        &kp PRCNT        &kp CARET         &kp AMPS           &kp STAR        &kp LPAR   &kp RPAR       &kp COLON
+&trans  &trans    &kp PLUS  &kp MINUS  &kp LEFT_BRACE  &kp RIGHT_BRACE  &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &kp UNDERSCORE  &kp EQUAL  &kp BACKSLASH  &trans
+                            &trans     &trans          &trans           &trans            &trans             &trans
+            >;
+        };
+
+        mouse_layer {
+            bindings = <
+&kp C_PLAY_PAUSE  &mkp RCLK       &msc SCRL_UP     &mmv MOVE_UP    &msc SCRL_DOWN   &trans     &kp PRINTSCREEN  &kp CAPS        &kp PAUSE_BREAK  &kp K_APP        &kp LA(LC(DELETE))  &kp C_VOL_UP
+&kp C_NEXT        &mkp LCLK       &mmv MOVE_LEFT   &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans     &kp LEFT_ARROW   &kp DOWN_ARROW  &kp UP_ARROW     &kp RIGHT_ARROW  &trans              &kp C_MUTE
+&kp C_PREVIOUS    &msc SCRL_LEFT  &msc SCRL_RIGHT  &mkp MB4        &mkp MB5         &mkp MCLK  &kp LA(F4)       &mo ADJ         &mo FMO          &trans           &trans              &kp C_VOL_DN
+                                                   &trans          &trans           &mo SMO    &mo SMO          &trans          &trans
+            >;
+        };
+
+        fast_mouse_layer {
+            bindings = <
+&trans  &trans         &msc SC_FUP     &mmv MV_FUP    &msc SC_FDOWN   &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans         &mmv MV_FLEFT   &mmv MV_FDOWN  &mmv MV_FRIGHT  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &msc SC_FLEFT  &msc SC_FRIGHT  &trans         &trans          &trans  &trans  &trans  &trans  &trans  &trans  &trans
+                                       &trans         &trans          &trans  &trans  &trans  &trans
+            >;
+        };
+
+        slow_mouse_layer {
+            bindings = <
+&trans  &trans         &msc SC_SUP     &mmv MV_SUP    &msc SC_SDOWN   &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans         &mmv MV_SLEFT   &mmv MV_SDOWN  &mmv MV_SRIGHT  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &msc SC_SLEFT  &msc SC_SRIGHT  &trans         &trans          &trans  &trans  &trans  &trans  &trans  &trans  &trans
+                                       &trans         &trans          &trans  &trans  &trans  &trans
+            >;
+        };
+
+        adjust_layer {
+            bindings = <
+&bootloader     &bt BT_DISC 0  &bt BT_DISC 1  &bt BT_DISC 2  &bt BT_DISC 3  &bt BT_DISC 4  &bt BT_DISC 4  &bt BT_DISC 3  &bt BT_DISC 2  &bt BT_DISC 1  &bt BT_DISC 0  &bootloader
+&bt BT_CLR_ALL  &bt BT_SEL 0   &bt BT_SEL 1   &bt BT_SEL 2   &bt BT_SEL 3   &bt BT_SEL 4   &bt BT_SEL 4   &bt BT_SEL 3   &bt BT_SEL 2   &bt BT_SEL 1   &bt BT_SEL 0   &bt BT_CLR_ALL
+&sys_reset      &none          &none          &none          &none          &bt BT_CLR     &bt BT_CLR     &none          &none          &none          &none          &sys_reset
+                                              &trans         &none          &trans         &trans         &none          &trans
+            >;
+        };
+
+        numbers {
+            bindings = <
+&trans  &trans  &trans  &kp F1   &kp F2   &kp F3   &kp MINUS        &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp ASTERISK  &trans
+&trans  &trans  &trans  &kp F4   &kp F5   &kp F6   &kp KP_NUMBER_0  &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &trans        &trans
+&trans  &trans  &trans  &kp F7   &kp F8   &kp F9   &kp PLUS         &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp SLASH     &trans
+                        &kp F10  &kp F11  &kp F12  &kp KP_ENTER     &kp BACKSPACE    &kp KP_DOT
+            >;
+        };
+    };
 };
